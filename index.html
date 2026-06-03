@@ -177,18 +177,17 @@
       max-width: 72ch;
     }
 
-    /* ── Comparison viewer ── */
-    .comp-viewer {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
+    /* ── Comparison grid ── */
+    .comparisons-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.2rem;
     }
 
-    .comp-header {
+    .comp-slot {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      min-height: 1.6rem;
+      flex-direction: column;
+      gap: 0.4rem;
     }
 
     .comp-slot-label {
@@ -250,6 +249,11 @@
       height: 100%;
       object-fit: cover;
       display: block;
+    }
+
+    .comp-slider-wrap.fit-contain .comp-video-raw,
+    .comp-slider-wrap.fit-contain .comp-video-denoised {
+      object-fit: contain;
     }
 
     /* denoised shows only to the RIGHT of the divider */
@@ -580,7 +584,7 @@
         </div>
       </div>
 
-      <!--
+      <!-- ── Scene 2 ── -->
       <div class="scene-card">
         <div class="scene-header">
           <span class="scene-number">Scene 2</span>
@@ -591,7 +595,7 @@
           the surface &mdash; particularly around the eyes &mdash; produce faint periodic signals
           that our method isolates and amplifies.
         </p>
-        <div class="comparisons-grid" data-scene="2" data-comparisons='[{"label":"Comparison 1","raw":"","denoised":""},{"label":"Comparison 2","raw":"","denoised":""}]'></div>
+        <div class="comparisons-grid" data-scene="2" data-fit="contain" data-comparisons='[{"label":"Intensity","raw":"static/videos/yodas_eyes_cropped/intensity_input.mp4","denoised":"static/videos/yodas_eyes_cropped/intensity_denoised.mp4"},{"label":"Derivative","raw":"static/videos/yodas_eyes_cropped/temporal_deriv_input.mp4","denoised":"static/videos/yodas_eyes_cropped/temporal_deriv_denoised.mp4"}]'></div>
         <div class="plot-row" style="display:none">
           <span class="plot-row-label">Temporal Pixel Plot</span>
           <div class="plot-scene-wrap" data-csv="static/data/scene2.csv" data-thumbnail="static/thumbnails/scene2.png">
@@ -600,20 +604,20 @@
           </div>
         </div>
       </div>
-      -->
+      
 
-      <!--
+      <!-- ── Scene 3 ── -->
       <div class="scene-card">
         <div class="scene-header">
           <span class="scene-number">Scene 3</span>
-          <span class="scene-name">Keyboard &amp; Book</span>
+          <span class="scene-name">Book &amp; Keyboard</span>
         </div>
         <p class="scene-description" style="display:none">
           A keyboard and book are filmed after brief contact with a warm hand. Residual heat
           conduction patterns spread slowly across the surfaces, leaving thermal fingerprints
           that are invisible in raw footage but clearly revealed after processing.
         </p>
-        <div class="comparisons-grid" data-scene="3" data-comparisons='[{"label":"Comparison 1","raw":"","denoised":""},{"label":"Comparison 2","raw":"","denoised":""}]'></div>
+        <div class="comparisons-grid" data-scene="3" data-comparisons='[{"label":"Intensity","raw":"static/videos/book_and_keyboard/intensity2_input.mp4","denoised":"static/videos/book_and_keyboard/intensity2_denoised.mp4"},{"label":"Cumulative","raw":"static/videos/book_and_keyboard/cumulative_input.mp4","denoised":"static/videos/book_and_keyboard/cumulative_denoised.mp4"},{"label":"Derivative","raw":"static/videos/book_and_keyboard/temporal_deriv_input.mp4","denoised":"static/videos/book_and_keyboard/temporal_deriv_denoised.mp4"},{"label":"Isocontour","raw":"static/videos/book_and_keyboard/isocontour_input.mp4","denoised":"static/videos/book_and_keyboard/isocontour_denoised.mp4"}]'></div>
         <div class="plot-row" style="display:none">
           <span class="plot-row-label">Temporal Pixel Plot</span>
           <div class="plot-scene-wrap" data-csv="static/data/scene3.csv" data-thumbnail="static/thumbnails/scene3.png">
@@ -622,7 +626,7 @@
           </div>
         </div>
       </div>
-      -->
+
 
       <!-- ── Scene 4 ── -->
       <div class="scene-card">
@@ -645,7 +649,7 @@
         </div>
       </div>
 
-      <!--
+      <!-- ── Scene 5 ── -->
       <div class="scene-card">
         <div class="scene-header">
           <span class="scene-number">Scene 5</span>
@@ -656,7 +660,7 @@
           currents. Processing the microbolometric video reveals the periodic air movement and
           heat redistribution patterns driven by the fan's rotation frequency.
         </p>
-        <div class="comparisons-grid" data-scene="5" data-comparisons='[{"label":"Comparison 1","raw":"","denoised":""},{"label":"Comparison 2","raw":"","denoised":""}]'></div>
+        <div class="comparisons-grid" data-scene="5" data-comparisons='[{"label":"Intensity","raw":"static/videos/spinning_fan/intensity_input.mp4","denoised":"static/videos/spinning_fan/intensity_denoised.mp4"},{"label":"Derivative","raw":"static/videos/spinning_fan/temporal_deriv_input.mp4","denoised":"static/videos/spinning_fan/temporal_deriv_denoised.mp4"}]'></div>
         <div class="plot-row" style="display:none">
           <span class="plot-row-label">Temporal Pixel Plot</span>
           <div class="plot-scene-wrap" data-csv="static/data/scene5.csv" data-thumbnail="static/thumbnails/scene5.png">
@@ -665,9 +669,8 @@
           </div>
         </div>
       </div>
-      -->
 
-      <!--
+      <!-- ── Scene 6 ── -->
       <div class="scene-card">
         <div class="scene-header">
           <span class="scene-number">Scene 6</span>
@@ -678,7 +681,7 @@
           emission of surfaces changes with polarizer angle due to polarization-dependent
           emissivity, producing subtle periodic intensity oscillations our method captures.
         </p>
-        <div class="comparisons-grid" data-scene="6" data-comparisons='[{"label":"Comparison 1","raw":"","denoised":""},{"label":"Comparison 2","raw":"","denoised":""}]'></div>
+        <div class="comparisons-grid" data-scene="6" data-comparisons='[{"label":"Intensity","raw":"static/videos/rotating_polarizer/intensity_input.mp4","denoised":"static/videos/rotating_polarizer/intensity_denoised.mp4"},{"label":"Derivative","raw":"static/videos/rotating_polarizer/temporal_deriv_input.mp4","denoised":"static/videos/rotating_polarizer/temporal_deriv_denoised.mp4"}]'></div>
         <div class="plot-row" style="display:none">
           <span class="plot-row-label">Temporal Pixel Plot</span>
           <div class="plot-scene-wrap" data-csv="static/data/scene6.csv" data-thumbnail="static/thumbnails/scene6.png">
@@ -687,9 +690,8 @@
           </div>
         </div>
       </div>
-      -->
 
-      <!--
+      <!-- ── Scene 7 ── -->
       <div class="scene-card">
         <div class="scene-header">
           <span class="scene-number">Scene 7</span>
@@ -701,7 +703,7 @@
           materials become measurable, revealing material-dependent thermal signatures
           invisible in broadband thermal imaging.
         </p>
-        <div class="comparisons-grid" data-scene="7" data-comparisons='[{"label":"Comparison 1","raw":"","denoised":""},{"label":"Comparison 2","raw":"","denoised":""}]'></div>
+        <div class="comparisons-grid" data-scene="7" data-comparisons='[{"label":"Intensity","raw":"static/videos/bandpass_lwir_filters/intensity_input.mp4","denoised":"static/videos/bandpass_lwir_filters/intensity_denoised.mp4"},{"label":"Derivative","raw":"static/videos/bandpass_lwir_filters/temporal_deriv_input.mp4","denoised":"static/videos/bandpass_lwir_filters/temporal_deriv_denoised.mp4"},{"label":"Isocontour","raw":"static/videos/bandpass_lwir_filters/isocontour_input.mp4","denoised":"static/videos/bandpass_lwir_filters/isocontour_denoised.mp4"}]'></div>
         <div class="plot-row" style="display:none">
           <span class="plot-row-label">Temporal Pixel Plot</span>
           <div class="plot-scene-wrap" data-csv="static/data/scene7.csv" data-thumbnail="static/thumbnails/scene7.png">
@@ -710,7 +712,6 @@
           </div>
         </div>
       </div>
-      -->
 
     </div>
   </section>
@@ -802,11 +803,12 @@
       return ph;
     }
 
-    function buildSlider(rawSrc, denoisedSrc, fps, speedup) {
+    function buildSlider(rawSrc, denoisedSrc, fps, speedup, fit) {
       const wrapper = el('div', 'comp-player');
 
       // ── slider ──
       const wrap = el('div', 'comp-slider-wrap');
+      if (fit === 'contain') wrap.classList.add('fit-contain');
       wrap.style.setProperty('--slider-pct', '50%');
 
       const rawVid      = makeVideo(rawSrc);
@@ -954,66 +956,26 @@
     }
 
     function buildViewer(grid) {
-      const defs = JSON.parse(grid.dataset.comparisons || '[]');
+      const defs    = JSON.parse(grid.dataset.comparisons || '[]');
       if (!defs.length) return;
       const fps     = parseFloat(grid.dataset.fps) || 30;
       const speedup = grid.dataset.speedup || null;
+      const fit     = grid.dataset.fit || 'cover';
 
-      const viewer  = el('div', 'comp-viewer');
-      const header  = el('div', 'comp-header');
-      const labelEl = el('span', 'comp-slot-label');
-      header.appendChild(labelEl);
-
-      let prevBtn = null, nextBtn = null, counterEl = null;
-      if (defs.length > 1) {
-        const nav = el('div', 'comp-nav');
-        prevBtn   = el('button', 'comp-nav-btn');
-        prevBtn.innerHTML = ICON.chevL;
-        prevBtn.setAttribute('aria-label', 'Previous');
-        counterEl = el('span', 'comp-counter');
-        nextBtn   = el('button', 'comp-nav-btn');
-        nextBtn.innerHTML = ICON.chevR;
-        nextBtn.setAttribute('aria-label', 'Next');
-        nav.append(prevBtn, counterEl, nextBtn);
-        header.appendChild(nav);
-      }
-      viewer.appendChild(header);
-
-      const stage  = el('div', 'comp-stage');
-      const panels = defs.map(def => {
-        const p = (def.raw && def.denoised)
-          ? buildSlider(def.raw, def.denoised, fps, speedup)
+      defs.forEach(def => {
+        const slot  = el('div', 'comp-slot');
+        if (def.label) {
+          const lbl = el('span', 'comp-slot-label');
+          lbl.textContent = def.label;
+          slot.appendChild(lbl);
+        }
+        const panel = (def.raw && def.denoised)
+          ? buildSlider(def.raw, def.denoised, fps, speedup, fit)
           : buildPlaceholder();
-        p.style.display = 'none';
-        stage.appendChild(p);
-        return p;
+        slot.appendChild(panel);
+        if (panel._activate) panel._activate();
+        grid.appendChild(slot);
       });
-      viewer.appendChild(stage);
-
-      let current = 0;
-      function activate(idx) {
-        const outgoing = panels[current];
-        if (outgoing._deactivate) outgoing._deactivate();
-        else outgoing.querySelectorAll('video').forEach(v => v.pause());
-        outgoing.style.display = 'none';
-
-        current = idx;
-        const incoming = panels[current];
-        incoming.style.display = '';
-        if (incoming._activate) incoming._activate();
-        else incoming.querySelectorAll('video').forEach(v => v.play().catch(() => {}));
-
-        labelEl.textContent = defs[current].label || '';
-        if (counterEl) counterEl.textContent = `${current + 1} / ${defs.length}`;
-        if (prevBtn)   prevBtn.disabled = current === 0;
-        if (nextBtn)   nextBtn.disabled = current === defs.length - 1;
-      }
-
-      if (prevBtn) prevBtn.addEventListener('click', () => { if (current > 0) activate(current - 1); });
-      if (nextBtn) nextBtn.addEventListener('click', () => { if (current < defs.length - 1) activate(current + 1); });
-
-      activate(0);
-      grid.appendChild(viewer);
     }
 
     document.querySelectorAll('.comparisons-grid[data-comparisons]').forEach(buildViewer);
