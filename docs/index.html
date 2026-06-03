@@ -3,41 +3,1163 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>revealing-subtle-heat</title>
+  <title>Revealing Subtle Heat Flows</title>
+  <link rel="icon" type="image/png" href="static/images/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      font-family: "Source Sans 3", "Segoe UI", Helvetica, Arial, sans-serif;
+      background: #fff;
+      color: #1a1a1a;
+      line-height: 1.6;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 3.5rem 1.5rem 2.5rem;
+      text-align: center;
+    }
+
+    .paper-title {
+      font-family: "EB Garamond", Georgia, serif;
+      font-size: clamp(2rem, 4.5vw, 3rem);
+      font-weight: 700;
+      line-height: 1.2;
+      color: #111;
+      margin-bottom: 1.6rem;
+    }
+
+    .authors {
+      font-size: 1.2rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .authors a {
+      color: #0b5ea8;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .authors a:hover { text-decoration: underline; }
+
+    .authors .dot {
+      color: #888;
+      margin: 0 0.3em;
+      font-size: 1.1em;
+      vertical-align: middle;
+    }
+
+    .affiliation {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .affiliation img {
+      height: 28px;
+      width: auto;
+    }
+
+    .venue-tag {
+      display: inline-block;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #C75B00;
+    }
+
+    /* ── Callout ── */
+    .callout-wrap {
+      max-width: 860px;
+      margin: 0 auto 3rem;
+      padding: 0 1.5rem;
+    }
+
+    .callout {
+      border: 1.5px solid #f0c040;
+      background: #fffbea;
+      border-radius: 8px;
+      padding: 1rem 1.4rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      font-size: 1.05rem;
+    }
+
+    .callout-icon { font-size: 1.3rem; line-height: 1.4; flex-shrink: 0; }
+    .callout-text { color: #3d2f00; }
+    .callout-text strong { font-weight: 600; }
+
+    /* ── Sections ── */
+    .section {
+      max-width: 860px;
+      margin: 0 auto 4rem;
+      padding: 0 1.5rem;
+    }
+
+    .section-title {
+      font-family: "EB Garamond", Georgia, serif;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 2px solid #eee;
+    }
+
+    /* ── TL;DR ── */
+    .tldr-box {
+      background: #fff8f8;
+      border: 1.5px solid #e8b4bc;
+      border-left: 5px solid #C75B00;
+      border-radius: 0 8px 8px 0;
+      padding: 1.2rem 1.6rem;
+      font-size: 1.1rem;
+      color: #1a1a1a;
+      line-height: 1.75;
+    }
+
+    /* ── Poster ── */
+    .poster-embed {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+
+    /* ── Scene cards ── */
+    .scene-list {
+      display: flex;
+      flex-direction: column;
+      gap: 3.5rem;
+    }
+
+    .scene-card {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .scene-header {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #eee;
+    }
+
+    .scene-number {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #C75B00;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .scene-name {
+      font-family: "EB Garamond", Georgia, serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #111;
+    }
+
+    .scene-description {
+      font-size: 1rem;
+      color: #444;
+      line-height: 1.65;
+      max-width: 72ch;
+    }
+
+    /* ── Comparison viewer ── */
+    .comp-viewer {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .comp-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 1.6rem;
+    }
+
+    .comp-slot-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #777;
+    }
+
+    .comp-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .comp-nav-btn {
+      width: 26px;
+      height: 26px;
+      border: 1px solid #ddd;
+      border-radius: 50%;
+      background: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #555;
+      transition: background 0.12s, border-color 0.12s;
+      padding: 0;
+    }
+
+    .comp-nav-btn:hover:not(:disabled) { background: #f3f4f6; border-color: #bbb; }
+    .comp-nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+    .comp-counter {
+      font-size: 0.8rem;
+      color: #999;
+      min-width: 2.2rem;
+      text-align: center;
+    }
+
+    /* ── Slider wrapper ── */
+    .comp-slider-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      border-radius: 6px;
+      cursor: col-resize;
+      user-select: none;
+      background: #111;
+    }
+
+    .comp-video-raw,
+    .comp-video-denoised {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* denoised shows only to the RIGHT of the divider */
+    .comp-video-denoised {
+      clip-path: inset(0 0 0 var(--slider-pct, 50%));
+    }
+
+    .comp-divider {
+      position: absolute;
+      top: 0;
+      left: var(--slider-pct, 50%);
+      transform: translateX(-50%);
+      width: 2px;
+      height: 100%;
+      background: rgba(255,255,255,0.9);
+      pointer-events: none;
+    }
+
+    .comp-handle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 34px;
+      height: 34px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #444;
+    }
+
+    .comp-badge {
+      position: absolute;
+      bottom: 0.5rem;
+      padding: 0.15rem 0.5rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-radius: 3px;
+      pointer-events: none;
+    }
+
+    .comp-badge-raw      { left: 0.5rem;  background: rgba(0,0,0,0.45); color: #eee; }
+    .comp-badge-denoised { right: 0.5rem; background: rgba(199,91,0,0.7); color: #fff; }
+    .comp-badge-speedup  { top: 0.5rem; right: 0.5rem; bottom: auto; background: rgba(0,0,0,0.55); color: #fff; }
+
+    /* ── Progress scrubber ── */
+    .comp-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: rgba(255,255,255,0.25);
+      cursor: pointer;
+      z-index: 8;
+      transition: height 0.12s;
+    }
+
+    .comp-slider-wrap:hover .comp-progress { height: 6px; }
+
+    .comp-progress-fill {
+      height: 100%;
+      background: #C75B00;
+      width: 0%;
+      pointer-events: none;
+      transition: width 0.08s linear;
+    }
+
+    /* ── Loading overlay ── */
+    .comp-loading {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      border-radius: 6px;
+    }
+
+    .comp-spinner {
+      width: 30px;
+      height: 30px;
+      border: 3px solid rgba(255,255,255,0.25);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Playback controls ── */
+    .comp-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      padding: 0.3rem 0;
+    }
+
+    .comp-ctrl-btn {
+      width: 30px;
+      height: 30px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #444;
+      padding: 0;
+      transition: background 0.12s, border-color 0.12s;
+    }
+
+    .comp-ctrl-btn:hover { background: #f3f4f6; border-color: #bbb; }
+
+    .comp-ctrl-btn.play-pause {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border-color: #ccc;
+      margin: 0 0.25rem;
+    }
+
+    /* ── Placeholder (no video yet) ── */
+    .comp-placeholder {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #f4f4f4;
+      border-radius: 6px;
+      border: 1px dashed #ccc;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      margin: 0;
+      color: #aaa;
+      font-size: 0.82rem;
+      gap: 0.35rem;
+    }
+
+    .comp-placeholder svg { opacity: 0.35; }
+
+    .plot-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .plot-row-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #777;
+    }
+
+    .plot-scene-wrap {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 1rem;
+      align-items: stretch;
+    }
+
+    @media (max-width: 600px) {
+      .plot-scene-wrap { grid-template-columns: 1fr; }
+    }
+
+    .thumbnail-wrap {
+      position: relative;
+      width: 100%;
+      align-self: start;
+    }
+
+    .thumbnail-wrap img {
+      width: 100%;
+      display: block;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+    }
+
+    .thumbnail-wrap canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border-radius: 6px;
+      pointer-events: none;
+    }
+
+    .thumbnail-placeholder {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background: #262626;
+      border-radius: 6px;
+      border: 1px solid #444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #555;
+      font-size: 0.78rem;
+    }
+
+    .plot-container {
+      width: 100%;
+      height: 260px;
+      border-radius: 6px;
+      border: 1px solid #e8e8e8;
+      overflow: hidden;
+    }
+
+    /* ── Citation ── */
+    .citation-block {
+      position: relative;
       background: #f6f8fa;
+      border: 1px solid #d0d7de;
+      border-radius: 8px;
+      padding: 1.1rem 1.4rem;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 0.85rem;
+      line-height: 1.7;
       color: #24292f;
+      white-space: pre;
+      overflow-x: auto;
     }
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 0.5rem;
-    }
-    p {
-      font-size: 1.1rem;
+
+    .copy-btn {
+      position: absolute;
+      top: 0.65rem;
+      right: 0.65rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.3rem 0.7rem;
+      font-family: "Source Sans 3", sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
       color: #57606a;
+      background: #fff;
+      border: 1px solid #d0d7de;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
     }
-    a {
-      color: #0969da;
-      text-decoration: none;
+
+    .copy-btn:hover { background: #f3f4f6; color: #111; }
+
+    .copy-btn.copied { color: #7a3800; border-color: #e8a87c; background: #fff1e6; }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid #eee;
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 0.82rem;
+      color: #888;
     }
-    a:hover {
-      text-decoration: underline;
-    }
+
+    footer a { color: #0b5ea8; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
-  <h1>revealing-subtle-heat</h1>
-  <p>Project website coming soon.</p>
-  <p>
-    <a href="https://github.com/srmanikandasriram/revealing-subtle-heat">View on GitHub</a>
-  </p>
+
+  <!-- ── Hero ── -->
+  <header class="hero">
+    <h1 class="paper-title">
+      Revealing Subtle Heat Flows<br>all around us<br>using Microbolometric Videos
+    </h1>
+    <p class="authors">
+      <a href="https://marvils.org/mani">Mani Ramanagopal</a><span class="dot">&middot;</span>
+      <a href="https://akihikooharazawa.github.io/">Akihiko Oharazawa</a><span class="dot">&middot;</span>
+      <a href="https://nnsriram97.github.io/">Sriram Narayanan</a><span class="dot">&middot;</span>
+      <a href="https://zqyuan.com/">Zeqing Yuan</a><span class="dot">&middot;</span>
+      <a href="https://www.cs.cmu.edu/~srinivas/">Srinivasa Narasimhan</a>
+    </p>
+    <div class="affiliation">
+      <img src="static/images/CMU.png" alt="Carnegie Mellon University" />
+      <span class="venue-tag">ICCP 2026 (PAMI Special Issue)</span>
+    </div>
+  </header>
+
+  <!-- ── Callout ── -->
+  <div class="callout-wrap">
+    <div class="callout">
+      <span class="callout-icon">&#128276;</span>
+      <p class="callout-text">
+        <strong>Coming soon &mdash;</strong> Paper, code, and data will be released before
+        <strong>ICCP 2026 (July&nbsp;13,&nbsp;2026)</strong>.
+      </p>
+    </div>
+  </div>
+
+  <!-- ── TL;DR ── -->
+  <section class="section">
+    <p class="tldr-box">
+      <strong>TL;DR</strong> &mdash; Low-cost thermal cameras have a reputation for being noisy and are presumed to be insufficient to capture subtle heat transport. We upend this conventional wisdom by a simple change in how we process microbolometric videos.
+    </p>
+  </section>
+
+  <!-- ── Results ── -->
+  <section class="section">
+    <h2 class="section-title">Experimental Results <span style="font-family:'Source Sans 3',sans-serif; font-size:0.85rem; font-weight:400; color:#C75B00; letter-spacing:0.02em;">&#x1F525; more scenes cooking</span></h2>
+    <div class="scene-list">
+
+      <!-- ── Scene 1 ── -->
+      <div class="scene-card">
+        <div class="scene-header">
+          <span class="scene-number">Scene 1</span>
+          <span class="scene-name">Bunny Wind Draft</span>
+        </div>
+        <p class="scene-description" style="display:none">
+          A warm ceramic bunny sits in still air while a gentle wind draft passes through the scene.
+          Convective heat plumes rising from the surface become visible after processing, revealing
+          how the airflow disturbs and carries heat away from the object.
+        </p>
+        <div class="comparisons-grid" data-scene="1" data-comparisons='[{"label":"Intensity","raw":"static/videos/bunny_wind_draft/intensity_input.mp4","denoised":"static/videos/bunny_wind_draft/intensity_denoised.mp4"},{"label":"Cumulative","raw":"static/videos/bunny_wind_draft/cumulative2_input.mp4","denoised":"static/videos/bunny_wind_draft/cumulative2_denoised.mp4"},{"label":"Derivative","raw":"static/videos/bunny_wind_draft/temporal_deriv_input.mp4","denoised":"static/videos/bunny_wind_draft/temporal_deriv_denoised.mp4"},{"label":"Isocontour","raw":"static/videos/bunny_wind_draft/isocontour_input.mp4","denoised":"static/videos/bunny_wind_draft/isocontour_denoised.mp4"}]'></div>
+        <div class="plot-row" style="display:none">
+          <span class="plot-row-label">Temporal Pixel Plot</span>
+          <div class="plot-scene-wrap" data-csv="static/data/scene1.csv" data-thumbnail="static/thumbnails/scene1.png">
+            <div class="thumbnail-wrap"></div>
+            <div class="plot-container"></div>
+          </div>
+        </div>
+      </div>
+
+      <!--
+      <div class="scene-card">
+        <div class="scene-header">
+          <span class="scene-number">Scene 2</span>
+          <span class="scene-name">Yoda's Eyes</span>
+        </div>
+        <p class="scene-description" style="display:none">
+          A figurine of Yoda is observed in thermal video. Subtle emissivity differences across
+          the surface &mdash; particularly around the eyes &mdash; produce faint periodic signals
+          that our method isolates and amplifies.
+        </p>
+        <div class="comparisons-grid" data-scene="2" data-comparisons='[{"label":"Comparison 1","raw":"","denoised":""},{"label":"Comparison 2","raw":"","denoised":""}]'></div>
+        <div class="plot-row" style="display:none">
+          <span class="plot-row-label">Temporal Pixel Plot</span>
+          <div class="plot-scene-wrap" data-csv="static/data/scene2.csv" data-thumbnail="static/thumbnails/scene2.png">
+            <div class="thumbnail-wrap"></div>
+            <div class="plot-container"></div>
+          </div>
+        </div>
+      </div>
+      -->
+
+      <!--
+      <div class="scene-card">
+        <div class="scene-header">
+          <span class="scene-number">Scene 3</span>
+          <span class="scene-name">Keyboard &amp; Book</span>
+        </div>
+        <p class="scene-description" style="display:none">
+          A keyboard and book are filmed after brief contact with a warm hand. Residual heat
+          conduction patterns spread slowly across the surfaces, leaving thermal fingerprints
+          that are invisible in raw footage but clearly revealed after processing.
+        </p>
+        <div class="comparisons-grid" data-scene="3" data-comparisons='[{"label":"Comparison 1","raw":"","denoised":""},{"label":"Comparison 2","raw":"","denoised":""}]'></div>
+        <div class="plot-row" style="display:none">
+          <span class="plot-row-label">Temporal Pixel Plot</span>
+          <div class="plot-scene-wrap" data-csv="static/data/scene3.csv" data-thumbnail="static/thumbnails/scene3.png">
+            <div class="thumbnail-wrap"></div>
+            <div class="plot-container"></div>
+          </div>
+        </div>
+      </div>
+      -->
+
+      <!-- ── Scene 4 ── -->
+      <div class="scene-card">
+        <div class="scene-header">
+          <span class="scene-number">Scene 4</span>
+          <span class="scene-name">Vehicle Exhaust</span>
+        </div>
+        <p class="scene-description" style="display:none">
+          Hot exhaust gases emanating from a vehicle are captured against an ambient background.
+          The turbulent thermal plume is largely imperceptible in raw microbolometric footage
+          but becomes strikingly visible after temporal processing.
+        </p>
+        <div class="comparisons-grid" data-scene="4" data-comparisons='[{"label":"Intensity","raw":"static/videos/vehicle_exhaust/intensity_input.mp4","denoised":"static/videos/vehicle_exhaust/intensity_denoised.mp4"},{"label":"Derivative","raw":"static/videos/vehicle_exhaust/temporal_deriv_input.mp4","denoised":"static/videos/vehicle_exhaust/temporal_deriv_denoised.mp4"}]'></div>
+        <div class="plot-row" style="display:none">
+          <span class="plot-row-label">Temporal Pixel Plot</span>
+          <div class="plot-scene-wrap" data-csv="static/data/scene4.csv" data-thumbnail="static/thumbnails/scene4.png">
+            <div class="thumbnail-wrap"></div>
+            <div class="plot-container"></div>
+          </div>
+        </div>
+      </div>
+
+      <!--
+      <div class="scene-card">
+        <div class="scene-header">
+          <span class="scene-number">Scene 5</span>
+          <span class="scene-name">Spinning Fan</span>
+        </div>
+        <p class="scene-description" style="display:none">
+          A spinning fan redistributes warm air in its vicinity, creating structured turbulent
+          currents. Processing the microbolometric video reveals the periodic air movement and
+          heat redistribution patterns driven by the fan's rotation frequency.
+        </p>
+        <div class="comparisons-grid" data-scene="5" data-comparisons='[{"label":"Comparison 1","raw":"","denoised":""},{"label":"Comparison 2","raw":"","denoised":""}]'></div>
+        <div class="plot-row" style="display:none">
+          <span class="plot-row-label">Temporal Pixel Plot</span>
+          <div class="plot-scene-wrap" data-csv="static/data/scene5.csv" data-thumbnail="static/thumbnails/scene5.png">
+            <div class="thumbnail-wrap"></div>
+            <div class="plot-container"></div>
+          </div>
+        </div>
+      </div>
+      -->
+
+      <!--
+      <div class="scene-card">
+        <div class="scene-header">
+          <span class="scene-number">Scene 6</span>
+          <span class="scene-name">Rotating Polarizer</span>
+        </div>
+        <p class="scene-description" style="display:none">
+          A linear polarizer is rotated in front of the thermal camera. The apparent thermal
+          emission of surfaces changes with polarizer angle due to polarization-dependent
+          emissivity, producing subtle periodic intensity oscillations our method captures.
+        </p>
+        <div class="comparisons-grid" data-scene="6" data-comparisons='[{"label":"Comparison 1","raw":"","denoised":""},{"label":"Comparison 2","raw":"","denoised":""}]'></div>
+        <div class="plot-row" style="display:none">
+          <span class="plot-row-label">Temporal Pixel Plot</span>
+          <div class="plot-scene-wrap" data-csv="static/data/scene6.csv" data-thumbnail="static/thumbnails/scene6.png">
+            <div class="thumbnail-wrap"></div>
+            <div class="plot-container"></div>
+          </div>
+        </div>
+      </div>
+      -->
+
+      <!--
+      <div class="scene-card">
+        <div class="scene-header">
+          <span class="scene-number">Scene 7</span>
+          <span class="scene-name">Bandpass LWIR Filters</span>
+        </div>
+        <p class="scene-description" style="display:none">
+          Longwave infrared bandpass filters are placed in the optical path, selectively
+          transmitting narrow spectral bands. Differences in spectral emission across
+          materials become measurable, revealing material-dependent thermal signatures
+          invisible in broadband thermal imaging.
+        </p>
+        <div class="comparisons-grid" data-scene="7" data-comparisons='[{"label":"Comparison 1","raw":"","denoised":""},{"label":"Comparison 2","raw":"","denoised":""}]'></div>
+        <div class="plot-row" style="display:none">
+          <span class="plot-row-label">Temporal Pixel Plot</span>
+          <div class="plot-scene-wrap" data-csv="static/data/scene7.csv" data-thumbnail="static/thumbnails/scene7.png">
+            <div class="thumbnail-wrap"></div>
+            <div class="plot-container"></div>
+          </div>
+        </div>
+      </div>
+      -->
+
+    </div>
+  </section>
+
+  <!-- ── Poster ── -->
+  <section class="section">
+    <h2 class="section-title">Poster</h2>
+    <iframe class="poster-embed" src="static/poster.pdf" title="ICCP 2026 Poster">
+      <p>Your browser does not support embedded PDFs.
+        <a href="static/poster.pdf">Download the poster</a> instead.
+      </p>
+    </iframe>
+  </section>
+
+  <!-- ── Citation ── -->
+  <section class="section">
+    <h2 class="section-title">Citation</h2>
+    <div class="citation-block" id="bibtex">
+      <button class="copy-btn" onclick="copyCitation(this)" aria-label="Copy BibTeX">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"/><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"/></svg>
+        Copy
+      </button>@inproceedings{ramanagopal2026revealingsubtleheat,
+  title     = {Revealing Subtle Heat Flows all around us using Microbolometric Videos},
+  author    = {Ramanagopal, Mani and Oharazawa, Akihiko and Narayanan, Sriram and
+               Yuan, Zeqing and Narasimhan, Srinivasa},
+  journal   = {IEEE Transactions on Pattern Analysis and Machine Intelligence
+               (PAMI) -- Special Issue on ICCP 2026},
+  year      = {2026}
+}</div>
+  </section>
+
+  <script>
+    function copyCitation(btn) {
+      const block = document.getElementById('bibtex');
+      const text = block.innerText.replace(/^Copy\s*/, '').trimStart();
+      navigator.clipboard.writeText(text).then(() => {
+        btn.classList.add('copied');
+        btn.querySelector('svg').style.display = 'none';
+        btn.childNodes[btn.childNodes.length - 1].textContent = ' Copied!';
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.querySelector('svg').style.display = '';
+          btn.childNodes[btn.childNodes.length - 1].textContent = ' Copy';
+        }, 2000);
+      });
+    }
+  </script>
+
+  <script>
+  // ── Video comparison sliders ──────────────────────────────────────────────
+  (function () {
+    const ICON = {
+      placeholder: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>`,
+      handle:  `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 6 15 12 9 18"/></svg>`,
+      chevL:   `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>`,
+      chevR:   `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 6 15 12 9 18"/></svg>`,
+      play:    `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21"/></svg>`,
+      pause:   `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>`,
+      prevFr:  `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="3" width="3" height="18" rx="1"/><polygon points="20 3 9 12 20 21"/></svg>`,
+      nextFr:  `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="17" y="3" width="3" height="18" rx="1"/><polygon points="4 3 15 12 4 21"/></svg>`,
+    };
+
+    function el(tag, cls) {
+      const e = document.createElement(tag);
+      if (cls) e.className = cls;
+      return e;
+    }
+
+    function makeVideo(src) {
+      const v = el('video');
+      v.src = src;
+      v.muted = true;
+      v.loop = true;
+      v.playsInline = true;
+      v.preload = 'none';   // load only when made active
+      return v;
+    }
+
+    function syncVideos(master, follower) {
+      master.addEventListener('timeupdate', () => {
+        if (Math.abs(master.currentTime - follower.currentTime) > 0.15)
+          follower.currentTime = master.currentTime;
+      });
+    }
+
+    function buildPlaceholder() {
+      const ph = el('div', 'comp-placeholder');
+      ph.innerHTML = ICON.placeholder + '<span>Video coming soon</span>';
+      return ph;
+    }
+
+    function buildSlider(rawSrc, denoisedSrc, fps, speedup) {
+      const wrapper = el('div', 'comp-player');
+
+      // ── slider ──
+      const wrap = el('div', 'comp-slider-wrap');
+      wrap.style.setProperty('--slider-pct', '50%');
+
+      const rawVid      = makeVideo(rawSrc);
+      const denoisedVid = makeVideo(denoisedSrc);
+      rawVid.className      = 'comp-video-raw';
+      denoisedVid.className = 'comp-video-denoised';
+      syncVideos(rawVid, denoisedVid);
+
+      const divider = el('div', 'comp-divider');
+      const handle  = el('div', 'comp-handle');
+      handle.innerHTML = ICON.handle;
+      divider.appendChild(handle);
+
+      const badgeRaw = el('span', 'comp-badge comp-badge-raw');
+      badgeRaw.textContent = 'Raw';
+      const badgeDen = el('span', 'comp-badge comp-badge-denoised');
+      badgeDen.textContent = 'Denoised';
+
+      if (speedup) {
+        const badgeSpeed = el('span', 'comp-badge comp-badge-speedup');
+        badgeSpeed.textContent = `${speedup}× speed`;
+        wrap.append(rawVid, denoisedVid, divider, badgeRaw, badgeDen, badgeSpeed);
+      } else {
+        wrap.append(rawVid, denoisedVid, divider, badgeRaw, badgeDen);
+      }
+
+      let dragging = false;
+      function setPos(clientX) {
+        const rect = wrap.getBoundingClientRect();
+        const pct  = Math.min(100, Math.max(0, (clientX - rect.left) / rect.width * 100));
+        wrap.style.setProperty('--slider-pct', pct + '%');
+      }
+      wrap.addEventListener('pointerdown', e => { dragging = true; wrap.setPointerCapture(e.pointerId); setPos(e.clientX); });
+      wrap.addEventListener('pointermove',  e => { if (dragging) setPos(e.clientX); });
+      wrap.addEventListener('pointerup',     () => { dragging = false; });
+      wrap.addEventListener('pointercancel',() => { dragging = false; });
+
+      // ── controls ──
+      const controls = el('div', 'comp-controls');
+
+      const prevFrameBtn = el('button', 'comp-ctrl-btn');
+      prevFrameBtn.innerHTML = ICON.prevFr;
+      prevFrameBtn.title = 'Previous frame';
+
+      const playPauseBtn = el('button', 'comp-ctrl-btn play-pause');
+      playPauseBtn.innerHTML = ICON.pause;
+      playPauseBtn.title = 'Play / Pause';
+
+      const nextFrameBtn = el('button', 'comp-ctrl-btn');
+      nextFrameBtn.innerHTML = ICON.nextFr;
+      nextFrameBtn.title = 'Next frame';
+
+      // sync icon to actual video state
+      rawVid.addEventListener('play',  () => { playPauseBtn.innerHTML = ICON.pause; });
+      rawVid.addEventListener('pause', () => { playPauseBtn.innerHTML = ICON.play;  });
+
+      playPauseBtn.addEventListener('click', () => {
+        if (rawVid.paused) {
+          rawVid.play().catch(() => {});
+          denoisedVid.play().catch(() => {});
+        } else {
+          rawVid.pause();
+          denoisedVid.pause();
+        }
+      });
+
+      function stepFrame(dir) {
+        rawVid.pause();
+        denoisedVid.pause();
+        const t = Math.max(0, rawVid.currentTime + dir / fps);
+        rawVid.currentTime = t;
+        denoisedVid.currentTime = t;
+      }
+      prevFrameBtn.addEventListener('click', () => stepFrame(-1));
+      nextFrameBtn.addEventListener('click', () => stepFrame(+1));
+
+      // ── loading overlay ──
+      const loadingOverlay = el('div', 'comp-loading');
+      loadingOverlay.innerHTML = '<div class="comp-spinner"></div>';
+      wrap.appendChild(loadingOverlay);
+
+      // ── progress scrubber ──
+      const progress     = el('div', 'comp-progress');
+      const progressFill = el('div', 'comp-progress-fill');
+      progress.appendChild(progressFill);
+      wrap.appendChild(progress);
+
+      rawVid.addEventListener('timeupdate', () => {
+        if (rawVid.duration)
+          progressFill.style.width = (rawVid.currentTime / rawVid.duration * 100) + '%';
+      });
+
+      function seekTo(clientX) {
+        const rect = progress.getBoundingClientRect();
+        const pct  = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+        const t    = pct * (rawVid.duration || 0);
+        rawVid.currentTime      = t;
+        denoisedVid.currentTime = t;
+      }
+
+      let seekDragging = false;
+      progress.addEventListener('pointerdown', e => {
+        e.stopPropagation();   // don't trigger the curtain-slider drag
+        seekDragging = true;
+        progress.setPointerCapture(e.pointerId);
+        seekTo(e.clientX);
+      });
+      progress.addEventListener('pointermove', e => { if (seekDragging) seekTo(e.clientX); });
+      progress.addEventListener('pointerup',     () => { seekDragging = false; });
+      progress.addEventListener('pointercancel', () => { seekDragging = false; });
+
+      // expose activate/deactivate for the viewer to call
+      wrapper._activate = function () {
+        const videos = [rawVid, denoisedVid];
+        let ready = 0;
+
+        function onReady() {
+          ready++;
+          if (ready === videos.length) {
+            loadingOverlay.style.display = 'none';
+            videos.forEach(v => v.play().catch(() => {}));
+          }
+        }
+
+        loadingOverlay.style.display = 'flex';
+        playPauseBtn.innerHTML = ICON.pause;
+
+        videos.forEach(v => {
+          v.load();   // trigger fetch (preload="none" means nothing loaded yet)
+          if (v.readyState >= 3) {
+            onReady();
+          } else {
+            v.addEventListener('canplay', onReady, { once: true });
+          }
+        });
+      };
+
+      wrapper._deactivate = function () {
+        [rawVid, denoisedVid].forEach(v => v.pause());
+      };
+
+      controls.append(prevFrameBtn, playPauseBtn, nextFrameBtn);
+      wrapper.append(wrap, controls);
+      return wrapper;
+    }
+
+    function buildViewer(grid) {
+      const defs = JSON.parse(grid.dataset.comparisons || '[]');
+      if (!defs.length) return;
+      const fps     = parseFloat(grid.dataset.fps) || 30;
+      const speedup = grid.dataset.speedup || null;
+
+      const viewer  = el('div', 'comp-viewer');
+      const header  = el('div', 'comp-header');
+      const labelEl = el('span', 'comp-slot-label');
+      header.appendChild(labelEl);
+
+      let prevBtn = null, nextBtn = null, counterEl = null;
+      if (defs.length > 1) {
+        const nav = el('div', 'comp-nav');
+        prevBtn   = el('button', 'comp-nav-btn');
+        prevBtn.innerHTML = ICON.chevL;
+        prevBtn.setAttribute('aria-label', 'Previous');
+        counterEl = el('span', 'comp-counter');
+        nextBtn   = el('button', 'comp-nav-btn');
+        nextBtn.innerHTML = ICON.chevR;
+        nextBtn.setAttribute('aria-label', 'Next');
+        nav.append(prevBtn, counterEl, nextBtn);
+        header.appendChild(nav);
+      }
+      viewer.appendChild(header);
+
+      const stage  = el('div', 'comp-stage');
+      const panels = defs.map(def => {
+        const p = (def.raw && def.denoised)
+          ? buildSlider(def.raw, def.denoised, fps, speedup)
+          : buildPlaceholder();
+        p.style.display = 'none';
+        stage.appendChild(p);
+        return p;
+      });
+      viewer.appendChild(stage);
+
+      let current = 0;
+      function activate(idx) {
+        const outgoing = panels[current];
+        if (outgoing._deactivate) outgoing._deactivate();
+        else outgoing.querySelectorAll('video').forEach(v => v.pause());
+        outgoing.style.display = 'none';
+
+        current = idx;
+        const incoming = panels[current];
+        incoming.style.display = '';
+        if (incoming._activate) incoming._activate();
+        else incoming.querySelectorAll('video').forEach(v => v.play().catch(() => {}));
+
+        labelEl.textContent = defs[current].label || '';
+        if (counterEl) counterEl.textContent = `${current + 1} / ${defs.length}`;
+        if (prevBtn)   prevBtn.disabled = current === 0;
+        if (nextBtn)   nextBtn.disabled = current === defs.length - 1;
+      }
+
+      if (prevBtn) prevBtn.addEventListener('click', () => { if (current > 0) activate(current - 1); });
+      if (nextBtn) nextBtn.addEventListener('click', () => { if (current < defs.length - 1) activate(current + 1); });
+
+      activate(0);
+      grid.appendChild(viewer);
+    }
+
+    document.querySelectorAll('.comparisons-grid[data-comparisons]').forEach(buildViewer);
+  })();
+  </script>
+
+  <script>
+  // ── Temporal pixel plots ──────────────────────────────────────────────────
+  (function () {
+    const C1 = '#C75B00';
+    const C2 = '#0b5ea8';
+
+    function parseCSV(text) {
+      const lines = text.trim().split('\n');
+      const meta = lines[0].match(/px1=(\d+),(\d+)\s+px2=(\d+),(\d+)\s+fps=(\d+(\.\d+)?)/);
+      const px1 = meta ? [parseInt(meta[1]), parseInt(meta[2])] : null;
+      const px2 = meta ? [parseInt(meta[3]), parseInt(meta[4])] : null;
+      const fps = meta ? parseFloat(meta[5]) : 1;
+      const labels = {
+        px1: px1 ? `Pixel (${px1[0]}, ${px1[1]})` : 'Pixel 1',
+        px2: px2 ? `Pixel (${px2[0]}, ${px2[1]})` : 'Pixel 2',
+      };
+      const rows = lines.slice(2).map(l => l.split(',').map(Number));
+      return {
+        labels, fps, px1, px2,
+        time:         rows.map(r => +(r[0] / fps).toFixed(4)),
+        px1_raw:      rows.map(r => r[1]),
+        px1_denoised: rows.map(r => r[2]),
+        px2_raw:      rows.map(r => r[3]),
+        px2_denoised: rows.map(r => r[4]),
+      };
+    }
+
+    function drawMarkers(canvas, img, px1, px2) {
+      const rect = img.getBoundingClientRect();
+      canvas.width  = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      [[px1, C1, '1'], [px2, C2, '2']].forEach(([px, color, label]) => {
+        if (!px) return;
+        const [row, col] = px;  // row=y, col=x in image space
+        const r = Math.max(canvas.width, canvas.height) * 0.028;
+        ctx.beginPath();
+        ctx.arc(col, row, r, 0, 2 * Math.PI);
+        ctx.fillStyle = color + 'cc';
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = Math.max(1.5, r * 0.3);
+        ctx.stroke();
+
+        // crosshair lines
+        const arm = r * 1.6;
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = Math.max(1, r * 0.18);
+        ctx.beginPath();
+        ctx.moveTo(col - arm, row); ctx.lineTo(col + arm, row);
+        ctx.moveTo(col, row - arm); ctx.lineTo(col, row + arm);
+        ctx.stroke();
+
+        // label
+        const fs = Math.max(10, r * 1.1);
+        ctx.font = `bold ${fs}px "Source Sans 3", sans-serif`;
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`P${label}`, col, row - r * 1.9);
+      });
+    }
+
+    function initThumbnail(wrap, src, px1, px2) {
+      const img = document.createElement('img');
+      img.alt = 'Scene thumbnail';
+      const canvas = document.createElement('canvas');
+      img.onload = () => {
+        drawMarkers(canvas, img, px1, px2);
+        // redraw on resize so canvas CSS scaling stays crisp
+        new ResizeObserver(() => drawMarkers(canvas, img, px1, px2)).observe(img);
+      };
+      img.onerror = () => {
+        wrap.innerHTML = '<div class="thumbnail-placeholder">Thumbnail coming soon</div>';
+      };
+      wrap.appendChild(img);
+      wrap.appendChild(canvas);
+      img.src = src;
+    }
+
+    function renderPlot(plotEl, d) {
+      const base = {
+        x: d.time, mode: 'lines',
+        hovertemplate: '%{x:.2f} s<br>%{y:.1f} ADU<extra>%{fullData.name}</extra>',
+      };
+      const traces = [
+        { ...base, y: d.px1_raw,      name: `${d.labels.px1} · Raw`,      line: { color: C1, width: 1,   dash: 'dot' }, opacity: 0.55 },
+        { ...base, y: d.px1_denoised, name: `${d.labels.px1} · Denoised`, line: { color: C1, width: 2.5               } },
+        { ...base, y: d.px2_raw,      name: `${d.labels.px2} · Raw`,      line: { color: C2, width: 1,   dash: 'dot' }, opacity: 0.55 },
+        { ...base, y: d.px2_denoised, name: `${d.labels.px2} · Denoised`, line: { color: C2, width: 2.5               } },
+      ];
+      const layout = {
+        margin: { t: 16, r: 16, b: 44, l: 60 },
+        paper_bgcolor: '#fff',
+        plot_bgcolor:  '#fafafa',
+        xaxis: { title: { text: 'Time (s)', standoff: 8 }, tickfont: { size: 11 }, gridcolor: '#eee', zeroline: false },
+        yaxis: { title: { text: 'Intensity (ADU)', standoff: 8 }, tickfont: { size: 11 }, gridcolor: '#eee', zeroline: false },
+        legend: { orientation: 'h', x: 0, y: 1.02, xanchor: 'left', yanchor: 'bottom', font: { size: 11 }, bgcolor: 'rgba(255,255,255,0.8)' },
+        font: { family: '"Source Sans 3", sans-serif' },
+      };
+      Plotly.newPlot(plotEl, traces, layout, {
+        responsive: true, displayModeBar: true,
+        modeBarButtonsToRemove: ['select2d','lasso2d','autoScale2d','toggleSpikelines'],
+      });
+    }
+
+    function initWrap(wrap) {
+      if (wrap.dataset.loaded) return;
+      wrap.dataset.loaded = '1';
+      const thumbWrap = wrap.querySelector('.thumbnail-wrap');
+      const plotEl   = wrap.querySelector('.plot-container');
+      fetch(wrap.dataset.csv)
+        .then(r => r.text())
+        .then(csv => {
+          const d = parseCSV(csv);
+          initThumbnail(thumbWrap, wrap.dataset.thumbnail, d.px1, d.px2);
+          renderPlot(plotEl, d);
+        })
+        .catch(() => {
+          if (plotEl) plotEl.textContent = 'Could not load plot data.';
+        });
+    }
+
+    const observer = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) initWrap(e.target); }),
+      { rootMargin: '200px' }
+    );
+    document.querySelectorAll('.plot-scene-wrap[data-csv]').forEach(el => observer.observe(el));
+  })();
+  </script>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <p>
+      &copy; 2026 The Authors &mdash;
+      <a href="https://github.com/srmanikandasriram/revealing-subtle-heat">GitHub</a>
+    </p>
+  </footer>
+
 </body>
 </html>
